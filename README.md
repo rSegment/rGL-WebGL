@@ -1,4 +1,4 @@
-rGL---WebGL
+rGL-WebGL
 ===========
 
  WebGL implemented and explored.
