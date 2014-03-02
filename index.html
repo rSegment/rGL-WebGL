@@ -1,32 +1,32 @@
 <html>
 
 <head>
-<title>rGL &mdash; Version 0.1</title>
+<title>rGL  Version 0.1</title>
 <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
 
 <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
 <script type="text/javascript" src="webgl-utils.js"></script>
 
 <script id="shader-fs" type="x-shader/x-fragment">
-    precision mediump float;
-    uniform float time;
-    void main() {
-      gl_FragColor = vec4(1.0,1.0,1.0,1.0);
-}
+	precision mediump float;
+	varying vec4 vColor;
+	void main(void) {
+	gl_FragColor = vColor;
+	}
 </script>
 
 <script id="shader-vs" type="x-shader/x-vertex">
-     attribute vec3 position;
-     uniform mat4 uMVMatrix;
-        uniform mat4 uPMatrix;
-       
+attribute vec3 aVposition;
+attribute vec4 aVcolor;
+uniform mat4 uMVMatrix;
+uniform mat4 uPMatrix;
+varying vec4 vColor;
 
-    void main()
-    {
-        gl_Position= uPMatrix * uMVMatrix * vec4(position,1.0);
-        
-      
-    }
+void main(void) {
+	gl_Position = uPMatrix * uMVMatrix * vec4(aVposition, 1.0);
+	vColor = aVcolor;
+}
+   
 </script>
 
 
@@ -35,27 +35,24 @@
     var gl;
     var running;
     var time;
-    var positionBufferObject;
+    var vertexBufferObject;
     var colorBufferObject;
 
-        // Shader pointers 
- 
-    var program;        //points to shader combination
-    var vertexColorAttribute;
-    var vertexPositionAttribute;
+      
+    var program;       
+    
 
 
     /*********************
     Step 2b 
     *********************/
 
-    var vertexPositions ;
-
-    var vertexColors;
+    
 
     //Global Variables
     var vao=0;
-    var positionBufferObject;
+    var vertexBufferObject;
+    var colorBufferObject;
 
     var now = new Date();
     var timeLapse;
@@ -126,10 +123,13 @@
          gl.useProgram(program);
 
 
-            //  vertexColorAttribute = gl.getAttribLocation(program, "colors");
-        program.vertexPositionAttribute = gl.getAttribLocation(program, "position");
-     
+            
+        program.vertexPositionAttribute = gl.getAttribLocation(program, "aVposition");
+   
       gl.enableVertexAttribArray(program.vertexPositionAttribute);
+
+       program.vertexColorAttribute = gl.getAttribLocation(program, "aVcolor");
+       gl.enableVertexAttribArray(program.vertexColorAttribute);
         
         program.pMatrixUniform = gl.getUniformLocation(program, "uPMatrix");
         program.mvMatrixUniform = gl.getUniformLocation(program, "uMVMatrix");
@@ -145,6 +145,20 @@
     var mvMatrixStack = [];
     var pMatrix = mat4.create();
 
+    function mvPushMatrix() {
+        var copy = mat4.create();
+        mat4.set(mvMatrix, copy);
+        mvMatrixStack.push(copy);
+    }
+
+    function mvPopMatrix() {
+        if (mvMatrixStack.length == 0) {
+            throw "Invalid popMatrix!";
+        }
+        mvMatrix = mvMatrixStack.pop();
+    }
+
+
     function setMatrixUniforms() {
         gl.uniformMatrix4fv(program.pMatrixUniform, false, pMatrix);
         gl.uniformMatrix4fv(program.mvMatrixUniform, false, mvMatrix);
@@ -154,45 +168,74 @@
 
     function InitializeVertexBuffer() {
 
-        positionBufferObject = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionBufferObject);
-        
-       vertexPositions = new Float32Array([
+        vertexBufferObject = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBufferObject);
+
+      var  vertexPositions =[
              0.0,  1.0,  0.0,
-            -1.0, -1.0,  0.0,
-             1.0, -1.0,  0.0
-        ]);
+            -1.0, -1.0,  1.0,
+             1.0, -1.0,  1.0,
 
-     vertexColors = new Float32Array( [
-            0.75,  0.75,  0.0,1.0,
-            0.75,  0.0,  0.0,1.0,
-            0.0,  0.75,  0.0,1.0
-        ]);
+            // Right face
+             0.0,  1.0,  0.0,
+             1.0, -1.0,  1.0,
+             1.0, -1.0, -1.0,
 
-        console.log("Initializing VertexBuffer");
+            // Back face
+             0.0,  1.0,  0.0,
+             1.0, -1.0, -1.0,
+            -1.0, -1.0, -1.0,
+
+            // Left face
+             0.0,  1.0,  0.0,
+            -1.0, -1.0, -1.0,
+            -1.0, -1.0,  1.0
+        ];
+
+     
+        console.log("Initializing VertexBuffer for vertices");
 
   
-       
+       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositions), gl.STATIC_DRAW);
+        vertexBufferObject.itemSize = 3;
+        vertexBufferObject.numItems =12;
+        
         
         
 
-       
+        console.log("Initializing VertexBuffer for colors");
+        
         colorBufferObject = gl.createBuffer();
-   
-        //----
-        
+           
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBufferObject);
+       var  vertexColors =[
+             1.0, 0.0, 0.0, 1.0,
+            0.0, 1.0, 0.0, 1.0,
+            0.0, 0.0, 1.0, 1.0,
+
+            // Right face
+            1.0, 0.0, 0.0, 1.0,
+            0.0, 0.0, 1.0, 1.0,
+            0.0, 1.0, 0.0, 1.0,
+
+            // Back face
+            1.0, 0.0, 0.0, 1.0,
+            0.0, 1.0, 0.0, 1.0,
+            0.0, 0.0, 1.0, 1.0,
+
+            // Left face
+            1.0, 0.0, 0.0, 1.0,
+            0.0, 0.0, 1.0, 1.0,
+            0.0, 1.0, 0.0, 1.0
+        ];
+
+         console.log("Initializing VertexBuffer for colors");
        
         
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositions), gl.STATIC_DRAW);
-        positionBufferObject.itemSize = 3;
-        positionBufferObject.numItems = 3;
-/*
-        gl.enableVertexAttribArray(vertexColorAttribute);
-        gl.bindBuffer(gl.ARRAY_BUFFER, colorBufferObject);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexColors), gl.STATIC_DRAW);
         colorBufferObject.itemSize = 4;
-        colorBufferObject.numItems = 3;
-*/
+        colorBufferObject.numItems = 12;
+
  }
 
 
@@ -219,33 +262,31 @@
         );
     }
    
+function degToRad(degrees) {
+        return degrees * Math.PI / 180;
+    }
 
+var rTriangle = 0;
 
-
-function  drawScene () {
-      
+    function  drawScene () {
+        gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        
+        
         mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
 
         mat4.identity(mvMatrix);
 
-        mat4.translate(mvMatrix, [-1.5, 0.0, -7.0]);
+        mat4.translate(mvMatrix, [-1.5, 0.0, -8.0]);
+        mvPushMatrix();
+        mat4.rotate(mvMatrix, degToRad(rTriangle), [0, 1, 0]);
         
-      //  gl.clearColor(1.0*cosine, 1.0*sine, 1.0*sine*cosine, 1.0);
- 
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-   gl.clearColor(0.0, 1.0, 1.0, 1.0);
-        gl.viewport(1, 1, gl.viewportWidth, gl.viewportHeight);
-       
-        
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBufferObject);
+        gl.vertexAttribPointer(program.vertexPositionAttribute, vertexBufferObject.itemSize, gl.FLOAT, false, 0, 0);
 
-                
-                
-// console.log(vertexPositionAttribute);
- // console.log(vertexColorAttribute);
-        //gl.bindBuffer(gl.ARRAY_BUFFER, positionBufferObject);
-        
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionBufferObject);
-        gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBufferObject);
+        gl.vertexAttribPointer(program.vertexColorAttribute, colorBufferObject.itemSize, gl.FLOAT, false, 0, 0);
 
    /*     gl.enableVertexAttribArray(vertexColorAttribute);
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBufferObject);
@@ -253,85 +294,45 @@ function  drawScene () {
 */
 
         setMatrixUniforms();
-        gl.drawArrays(gl.TRIANGLES, 0, 3);
+        gl.drawArrays(gl.TRIANGLES, 0, 12);
+        mvPopMatrix();
    
     // body...
 }
         var sine;
         var cosine;
+        var lastTime = 0;
 
+
+
+    function animate(){       
+     var timeNow = new Date().getTime();
+        if (lastTime != 0) {
+            var elapsed = timeNow - lastTime;
+
+            rTriangle += (90 * elapsed) / 1000.0;
+            
+        }
+        lastTime = timeNow;
+
+    }
+
+        var loc;
+   
  function tick() {
         requestAnimFrame(tick);
         drawScene();
         animate();
     }
 
-    function animate(){       
-     now = new Date();
-        timeLapse = now.getTime();
-        timeLapse = timeLapse / 1000.0;
-   //     console.log(timeLapse);
-        sine = Math.sin(timeLapse);
-        cosine = Math.cos(timeLapse);}
-
-        var loc;
-   
-
-
     function main() {
-      glCanvas = document.getElementById("rGL-canvas");
-       init(glCanvas);
+        glCanvas = document.getElementById("rGL-canvas");
+        init(glCanvas);
         LoadShader();
-        
-       InitializeVertexBuffer();
-       gl.enable(gl.DEPTH_TEST);
-
-        
-        
-       // timeLapse = now.getTime();
-        timeLapse=0;
-        
-       
-    
-
-        
-
-        
-       
-        //gl.clearColor(1.0, 1.0, 0.0, 1.0);
-        
-
-
-        
-
-
-
-      
-/*
-        gl.bindBuffer(gl.ARRAY_BUFFER, colorBufferObject);
-        gl.vertexAttribPointer(vertexColorAttribute, colorBufferObject.itemSize, gl.FLOAT, false, 0, 0);
-*/
-      
-
-
-        
-
-        
-        /**********************
-        4. Main Loop
-        ***********************/
-
-
-      tick();
-  
-
-
-       
-
-        
-
-
-        }
+        InitializeVertexBuffer();
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.enable(gl.DEPTH_TEST);
+      tick();   }
         
 
        
