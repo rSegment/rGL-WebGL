@@ -58,9 +58,19 @@
     Step 2b 
     *********************/
 
-    var vertexPositions ;
+    var vertexPositions = new Float32Array([
+			0.75,  0.75,  0.0,
+			0.75, -0.75,  0.0,
+			-0.75, -0.75,  0.0
+        ]);
 
-    var vertexColors;
+     var vertexColors = new Float32Array( [
+            0.75,  0.75,  0.0,1.0,
+            0.75,  0.0,  0.0,1.0,
+            0.0,  0.75,  0.0,1.0
+        ]);
+
+ 
 
     //Global Variables
     var vao=0;
@@ -166,23 +176,15 @@
 
 
     function InitializeVertexBuffer() {
-
+		console.log("Initializing VertexBuffer");
         positionBufferObject = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBufferObject);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositions), gl.STATIC_DRAW);
+        positionBufferObject.itemSize = 3;
+        positionBufferObject.numItems = 3; 
+
+
         
-       vertexPositions = new Float32Array([
-             0.75,  0.75,  0.0,
-            0.75, -0.75,  0.0,
-             -0.75, -0.75,  0.0
-        ]);
-
-     vertexColors = new Float32Array( [
-            0.75,  0.75,  0.0,1.0,
-            0.75,  0.0,  0.0,1.0,
-            0.0,  0.75,  0.0,1.0
-        ]);
-
-        console.log("Initializing VertexBuffer");
 
   
        
@@ -196,9 +198,7 @@
         
        
         
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositions), gl.STATIC_DRAW);
-        positionBufferObject.itemSize = 3;
-        positionBufferObject.numItems = 3;
+        
 /*
         gl.enableVertexAttribArray(vertexColorAttribute);
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBufferObject);
@@ -252,17 +252,13 @@ function  drawScene () {
         
        gl.clearColor(1.0*cosine, 1.0*sine, 1.0*sine*cosine, 1.0);
  
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.clear(gl.COLOR_BUFFER_BIT );
    gl.clearColor(1.0, 1.0, 0.0, 1.0);
         gl.viewport(1, 1, gl.viewportWidth, gl.viewportHeight);
        
-        
+        gl.uniform1f(program.timeUniform, sine);
 
-                
-                
-// console.log(vertexPositionAttribute);
- // console.log(vertexColorAttribute);
-        //gl.bindBuffer(gl.ARRAY_BUFFER, positionBufferObject);
+
         
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBufferObject);
         gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
@@ -272,7 +268,7 @@ function  drawScene () {
         gl.vertexAttribPointer(vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
 */
 
-        gl.uniform1f(program.timeUniform, sine);
+        
         
         gl.drawArrays(gl.TRIANGLES, 0, 3);
    
@@ -302,37 +298,8 @@ function  drawScene () {
        InitializeVertexBuffer();
        gl.enable(gl.DEPTH_TEST);
 
-        
-        
-       // timeLapse = now.getTime();
         timeLapse=0;
-        
-       
-    
-
-        
-
-        
-       
-        //gl.clearColor(1.0, 1.0, 0.0, 1.0);
-        
-
-
-        
-
-
-
-      
-/*
-        gl.bindBuffer(gl.ARRAY_BUFFER, colorBufferObject);
-        gl.vertexAttribPointer(vertexColorAttribute, colorBufferObject.itemSize, gl.FLOAT, false, 0, 0);
-*/
-      
-
-
-        
-
-        
+         
         /**********************
         4. Main Loop
         ***********************/
@@ -340,14 +307,7 @@ function  drawScene () {
 
       tick();
   
-
-
-       
-
-        
-
-
-        }
+   }
         
 
        
@@ -361,12 +321,12 @@ function  drawScene () {
 
 
 <body onload="main();">
-    <a href="http://learningwebgl.com/blog/?p=28">&lt;&lt; Back to Lesson 1</a><br />
+    <a href="https://github.com/rSegment/rGL-WebGL">&lt;&lt; Back to repository</a><br />
 
     <canvas id="rGL-canvas" style="border: none;" width="800" height="600"></canvas>
 
     <br/>
-    <a href="http://learningwebgl.com/blog/?p=28">&lt;&lt; Back to Lesson 1</a><br />
+    <a href="https://github.com/rSegment/rGL-WebGL">&lt;&lt; Back to repository</a><br />
 </body>
 
-</html>
+</html> 
