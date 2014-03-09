@@ -119,17 +119,17 @@
     var pMatrix = mat4.create();
 
     function mvPushMatrix() {
-        var copy = mat4.create();
+      /*  var copy = mat4.create();
         mat4.set(mvMatrix, copy);
         mvMatrixStack.push(copy);
-    }
+    */}
 
     function mvPopMatrix() {
-        if (mvMatrixStack.length == 0) {
+      /*  if (mvMatrixStack.length == 0) {
             throw "Invalid popMatrix!";
         }
         mvMatrix = mvMatrixStack.pop();
-    }
+    */}
 
 
     function setMatrixUniforms() {

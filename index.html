@@ -26,8 +26,8 @@
     
   
     uniform float sine;
-    uniform vec4 uPMatrix;
-    uniform vec4 uMVMatrix;
+    uniform mat4 uPMatrix;
+    uniform mat4 uMVMatrix;
 
 	varying vec4 vColor;
        
@@ -35,7 +35,7 @@
     void main()
     {
         
-        gl_Position= vec4(position*sine,1.0);
+        gl_Position=uPMatrix*uMVMatrix * vec4(position,1.0);
 		vColor=color;
         
       
@@ -58,6 +58,12 @@
     var vertexPositionAttribute;
     var vertexColorAttribute;
 
+    //this is the model view matrix
+    var mvMatrix = mat4.create();
+    //this is a stack of model view matrixes
+    var mvMatrixStack = [];
+    //this is the prespective matrix
+    var pMatrix = mat4.create();
 
     /*********************
     Step 2b 
@@ -70,9 +76,9 @@
         ]);
 
      var vertexColors = new Float32Array( [
-            0.75,  0.75,  0.0,1.0,
-            0.75,  0.0,  0.0,1.0,
-            0.0,  0.75,  0.0,1.0
+            0.3,  0.75,  0.75,1.0,
+            0.75,  0.5,  0.75,1.0,
+            0.5,  0.75,  0.75,1.0
         ]);
 
  
@@ -177,12 +183,6 @@
 
 
 
-    //this is the model view matrix
-    var mvMatrix = mat4.create();
-    //this is a stack of model view matrixes
-    var mvMatrixStack = [];
-    //this is the prespective matrix
-    var pMatrix = mat4.create();
 
     var timeLapse=0.0;
 
@@ -262,6 +262,7 @@
    
 
 
+var rTri=0;
 
 function  drawScene () {
         now = new Date();
@@ -270,21 +271,27 @@ function  drawScene () {
    //     console.log(timeLapse);
         sine = Math.sin(timeLapse);
         cosine = Math.cos(timeLapse);
-
-
-        mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
-
-        mat4.identity(mvMatrix);
-
-        mat4.translate(mvMatrix, [-1.5, 0.0, -7.0]);
-        
-       gl.clearColor(1.0*cosine, 1.0*sine, 1.0*sine*cosine, 1.0);
+         
+      // gl.clearColor(1.0*cosine, 1.0*sine, 1.0*sine*cosine, 1.0);
  
         gl.clear(gl.COLOR_BUFFER_BIT );
          gl.clearColor(1.0, 1.0, 0.0, 1.0);
-        gl.viewport(1, 1, gl.viewportWidth, gl.viewportHeight);
+        gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+
+        mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 10000.0, pMatrix);
+        
+        mat4.identity(mvMatrix);
+
+        mat4.translate(mvMatrix, [-1.5*sine, 0.0, -7.0]);
+
+      // mvPushMatrix();
+
+        mat4.rotate(mvMatrix, degToRad(rTri), [0.5, 1, 1]);
+
+        setMatrixUniforms();
        
         gl.uniform1f(program.timeUniform, sine);
+        
 
 
         gl.enableVertexAttribArray(vertexPositionAttribute);
@@ -299,7 +306,7 @@ function  drawScene () {
         
         
         gl.drawArrays(gl.TRIANGLES, 0, 3);
-   
+    //    mvPopMatrix();
     // body...
 }
         var sine;
@@ -310,8 +317,15 @@ function  drawScene () {
         drawScene();
         animate();
     }
+var lastTime=0;
+    function animate(){     
+        var timeNow = new Date().getTime();
+        if (lastTime != 0) {
+            var elapsed = timeNow - lastTime;
 
-    function animate(){       
+            rTri += (90 * elapsed) / 1000.0;
+        }
+        lastTime = timeNow;
    }
 
         var loc;
