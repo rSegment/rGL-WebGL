@@ -20,11 +20,15 @@
 </script>
 
 <script id="shader-vs" type="x-shader/x-vertex">
+    attribute vec3 position;
+    attribute vec4 color;
     precision highp float;
     
   
     uniform float sine;
-    attribute vec3 position;
+    uniform vec4 uPMatrix;
+    uniform vec4 uMVMatrix;
+
 	varying vec4 vColor;
        
 
@@ -32,7 +36,7 @@
     {
         
         gl_Position= vec4(position*sine,1.0);
-		vColor=gl_Position;
+		vColor=color;
         
       
     }
@@ -50,8 +54,9 @@
         // Shader pointers 
  
     var program;        //points to shader combination
-    var vertexColorAttribute;
+    
     var vertexPositionAttribute;
+    var vertexColorAttribute;
 
 
     /*********************
@@ -144,15 +149,27 @@
          gl.useProgram(program);
 
 
-            //  vertexColorAttribute = gl.getAttribLocation(program, "colors");
-        program.vertexPositionAttribute = gl.getAttribLocation(program, "position");
-     
-      gl.enableVertexAttribArray(program.vertexPositionAttribute);
         
-      /*  program.pMatrixUniform = gl.getUniformLocation(program, "uPMatrix");
-        program.mvMatrixUniform = gl.getUniformLocation(program, "uMVMatrix");*/
+        vertexPositionAttribute = gl.getAttribLocation(program, "position");
+        vertexColorAttribute = gl.getAttribLocation(program, "color");
+     
+
+
+        program.pMatrixUniform = gl.getUniformLocation(program, "uPMatrix");
+        program.mvMatrixUniform = gl.getUniformLocation(program, "uMVMatrix");
         program.timeUniform = gl.getUniformLocation(program, "sine");
        // gl.uniform1f(program.timeUniform, timeLapse);
+
+            console.log(
+            "Attributes: " 
+            + "\nvertexPositionAttribute="+ vertexPositionAttribute
+            + "\nvertexColorAttribute="+ vertexColorAttribute 
+            + "\nUniforms: "
+            + "\npMatrixUniform="+ program.pMatrixUniform 
+            + "\nmvMatrixUniform="+ program.mvMatrixUniform 
+            + "\ntimeUniform="+ program.timeUniform 
+            + "\n"
+              );
        
 
       
@@ -160,52 +177,63 @@
 
 
 
-
+    //this is the model view matrix
     var mvMatrix = mat4.create();
+    //this is a stack of model view matrixes
     var mvMatrixStack = [];
+    //this is the prespective matrix
     var pMatrix = mat4.create();
+
     var timeLapse=0.0;
 
+    //this will push the current mvMatrix to a stack
+    function mvPushMatrix(){
+        var copy = mat4.create();
+        mat4.set(mvMatrix,copy);
+        mvMatrixStack.push(copy);
+    }
+
+    //this will pop the current mvMatrix from a stack
+    function mvPopMatrix(){
+        if(mvMatrixStack.length===0){
+            throw "invalid popmatrix!";
+        }
+        mvMatrix=mvMatrixStack.pop();
+        }
+    
+    //converts degrees to radians
+    function degToRad(degrees) {
+        return degrees * Math.PI / 180;
+    }
+
+//Sets the matrix uniforms
     function setMatrixUniforms() {
-       /* gl.uniformMatrix4fv(program.pMatrixUniform, false, pMatrix);
-        gl.uniformMatrix4fv(program.mvMatrixUniform, false, mvMatrix);
-       */ 
-       gl.uniform1f(program.timeUniform, timeLapse);
+       gl.uniformMatrix4fv(program.pMatrixUniform, false, pMatrix);
+       gl.uniformMatrix4fv(program.mvMatrixUniform, false, mvMatrix);
+        
+       
     }
 
 
 
     function InitializeVertexBuffer() {
 		console.log("Initializing VertexBuffer");
+        
         positionBufferObject = gl.createBuffer();
+        gl.enableVertexAttribArray(vertexPositionAttribute);
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBufferObject);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositions), gl.STATIC_DRAW);
         positionBufferObject.itemSize = 3;
-        positionBufferObject.numItems = 3; 
+       positionBufferObject.numItems = 3; 
 
-
-        
-
-  
-       
-        
-        
-
-       
+       console.log("Initializing Color");
         colorBufferObject = gl.createBuffer();
-   
-        //----
-        
-       
-        
-        
-/*
-        gl.enableVertexAttribArray(vertexColorAttribute);
+         gl.enableVertexAttribArray(vertexColorAttribute);
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBufferObject);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexColors), gl.STATIC_DRAW);
         colorBufferObject.itemSize = 4;
         colorBufferObject.numItems = 3;
-*/
+
  }
 
 
@@ -253,20 +281,20 @@ function  drawScene () {
        gl.clearColor(1.0*cosine, 1.0*sine, 1.0*sine*cosine, 1.0);
  
         gl.clear(gl.COLOR_BUFFER_BIT );
-   gl.clearColor(1.0, 1.0, 0.0, 1.0);
+         gl.clearColor(1.0, 1.0, 0.0, 1.0);
         gl.viewport(1, 1, gl.viewportWidth, gl.viewportHeight);
        
         gl.uniform1f(program.timeUniform, sine);
 
 
-        
+        gl.enableVertexAttribArray(vertexPositionAttribute);
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBufferObject);
         gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
 
-   /*     gl.enableVertexAttribArray(vertexColorAttribute);
+       gl.enableVertexAttribArray(vertexColorAttribute);
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBufferObject);
         gl.vertexAttribPointer(vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
-*/
+
 
         
         
