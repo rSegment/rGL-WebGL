@@ -11,10 +11,10 @@
     precision highp float;
     uniform float sine;
     float cosine;
-	varying vec4 vColor;
+    varying vec4 vColor;
      void main() {
        
-		cosine=cos(sine);
+        cosine=cos(sine);
       gl_FragColor = vec4(vColor.r*cosine,vColor.g*sine,vColor.b*cosine,1.0);
 }
 </script>
@@ -29,14 +29,14 @@
     uniform mat4 uPMatrix;
     uniform mat4 uMVMatrix;
 
-	varying vec4 vColor;
+    varying vec4 vColor;
        
 
     void main()
     {
         
         gl_Position=uPMatrix*uMVMatrix * vec4(position,1.0);
-		vColor=color;
+        vColor=color;
         
       
     }
@@ -70,21 +70,15 @@
     *********************/
 
     var vertexPositions = new Float32Array([
-			0.75,  0.75,  0.0,
-			0.75, -0.75,  0.0,
-			-0.75, -0.75,  0.0
+            0.75,  0.75,  0.0,
+            0.75, -0.75,  0.0,
+            -0.75, -0.75,  0.0
         ]);
 
      var vertexColors = new Float32Array( [
-<<<<<<< HEAD
             0.3,  0.75,  0.75,1.0,
             0.75,  0.5,  0.75,1.0,
             0.5,  0.75,  0.75,1.0
-=======
-            0.75,  0.75,  0.0,1.0,
-            0.75,  0.0,  0.0,1.0,
-            0.0,  0.75,  0.0,1.0
->>>>>>> Changes in order to stay similar to cpp version
         ]);
 
  
@@ -212,7 +206,6 @@
         return degrees * Math.PI / 180;
     }
 
-<<<<<<< HEAD
 //Sets the matrix uniforms
     function setMatrixUniforms() {
        gl.uniformMatrix4fv(program.pMatrixUniform, false, pMatrix);
@@ -222,44 +215,20 @@
     }
 
 
-=======
 
     function InitializeVertexBuffer() {
-		console.log("Initializing VertexBuffer");
-        positionBufferObject = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionBufferObject);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositions), gl.STATIC_DRAW);
-        positionBufferObject.itemSize = 3;
-        positionBufferObject.numItems = 3; 
-
-
-        
->>>>>>> Changes in order to stay similar to cpp version
-
-    function InitializeVertexBuffer() {
-		console.log("Initializing VertexBuffer");
+        console.log("Initializing VertexBuffer");
         
         positionBufferObject = gl.createBuffer();
         gl.enableVertexAttribArray(vertexPositionAttribute);
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBufferObject);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositions), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositions), gl.STATIC_DRAW);
         positionBufferObject.itemSize = 3;
        positionBufferObject.numItems = 3; 
 
        console.log("Initializing Color");
         colorBufferObject = gl.createBuffer();
-<<<<<<< HEAD
          gl.enableVertexAttribArray(vertexColorAttribute);
-=======
-   
-        //----
-        
-       
-        
-        
-/*
-        gl.enableVertexAttribArray(vertexColorAttribute);
->>>>>>> Changes in order to stay similar to cpp version
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBufferObject);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexColors), gl.STATIC_DRAW);
         colorBufferObject.itemSize = 4;
@@ -317,7 +286,6 @@ function  drawScene () {
 
       // mvPushMatrix();
 
-<<<<<<< HEAD
         mat4.rotate(mvMatrix, degToRad(rTri), [0.5, 1, 1]);
 
         setMatrixUniforms();
@@ -327,20 +295,6 @@ function  drawScene () {
 
 
         gl.enableVertexAttribArray(vertexPositionAttribute);
-=======
-        mat4.translate(mvMatrix, [-1.5, 0.0, -7.0]);
-        
-       gl.clearColor(1.0*cosine, 1.0*sine, 1.0*sine*cosine, 1.0);
- 
-        gl.clear(gl.COLOR_BUFFER_BIT );
-   gl.clearColor(1.0, 1.0, 0.0, 1.0);
-        gl.viewport(1, 1, gl.viewportWidth, gl.viewportHeight);
-       
-        gl.uniform1f(program.timeUniform, sine);
-
-
-        
->>>>>>> Changes in order to stay similar to cpp version
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBufferObject);
         gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
 
@@ -348,10 +302,7 @@ function  drawScene () {
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBufferObject);
         gl.vertexAttribPointer(vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
 
-<<<<<<< HEAD
 
-=======
->>>>>>> Changes in order to stay similar to cpp version
         
         
         gl.drawArrays(gl.TRIANGLES, 0, 3);
