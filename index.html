@@ -74,6 +74,7 @@
 			0.75, -0.75,  0.0,
 			-0.75, -0.75,  0.0
         ]);
+<<<<<<< HEAD
 
      var vertexColors = new Float32Array( [
 <<<<<<< HEAD
@@ -87,6 +88,15 @@
 >>>>>>> Changes in order to stay similar to cpp version
         ]);
 
+=======
+
+     var vertexColors = new Float32Array( [
+            0.75,  0.75,  0.0,1.0,
+            0.75,  0.0,  0.0,1.0,
+            0.0,  0.75,  0.0,1.0
+        ]);
+
+>>>>>>> edc458efb2c7abb1927fab3bc0199b3240d46c3e
  
 
     //Global Variables
@@ -231,7 +241,13 @@
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositions), gl.STATIC_DRAW);
         positionBufferObject.itemSize = 3;
         positionBufferObject.numItems = 3; 
+<<<<<<< HEAD
 
+=======
+
+
+        
+>>>>>>> edc458efb2c7abb1927fab3bc0199b3240d46c3e
 
         
 >>>>>>> Changes in order to stay similar to cpp version
@@ -349,9 +365,12 @@ function  drawScene () {
         gl.vertexAttribPointer(vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 >>>>>>> Changes in order to stay similar to cpp version
+=======
+>>>>>>> edc458efb2c7abb1927fab3bc0199b3240d46c3e
         
         
         gl.drawArrays(gl.TRIANGLES, 0, 3);
