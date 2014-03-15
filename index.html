@@ -118,11 +118,42 @@
     var glCanvas;
     var gl ;
 
+//gets shader by filename
+function getShaderFile(path,shaderType){      
+  var XHR = new XMLHttpRequest();
+  XHR.open("GET", path, false);
+   
+  if(XHR.overrideMimeType){
+    XHR.overrideMimeType("text/plain");
+  }
+   
+  try{
+    XHR.send(null);
+  }catch(e){
+    alert('Error reading file "' + path + '"');
+  }
+          var str=XHR.responseText;
+          var shadert;
+              if(shaderType == "fragment"){
+                shadert = gl.createShader(gl.FRAGMENT_SHADER);
+            } else if(shaderType == "vertex"){
+                shadert = gl.createShader(gl.VERTEX_SHADER);
+            } else {
+                return null;
+            }
+            
+            gl.shaderSource(shadert, str);
+            gl.compileShader(shadert);
+            
+            if(!gl.getShaderParameter(shadert, gl.COMPILE_STATUS)){
+                alert(gl.getShaderInfoLog(shadert));
+                return null;
+            }
+  return shadert;
+};
 
-    
-
-
-    function getShader(gl, id) {
+//gets shader by container
+    function getShaderContainer(gl, id) {
         var shaderScript = document.getElementById(id);
         if (!shaderScript) {
             return null;
@@ -163,10 +194,11 @@
     function LoadShader() {
 
         console.log("Compiling fragment shader.");
-        var fs = getShader(gl, "shader-fs");
+        var fs = getShaderContainer(gl, "shader-fs");
+        //var fs = getShaderFile("../shaders/fs.frag","fragment");
         console.log("Compiling vertex shader.");
-        var vs = getShader(gl, "shader-vs");
-
+        var vs = getShaderContainer(gl, "shader-vs");
+        //var vs = getShaderFile("../shaders/vs.vert","vertex");
         console.log("Linking program");
         program = gl.createProgram();
         gl.attachShader(program, vs);
