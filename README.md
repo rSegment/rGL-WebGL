@@ -5,6 +5,4 @@ rGL-WebGL
  
  Credits to http://learningwebgl.com for the examples and structure of the code
  
- To quickly set up a local server for this project : 
- 
- python -m SimpleHTTPServer
+
